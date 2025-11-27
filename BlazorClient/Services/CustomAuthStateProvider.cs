@@ -78,7 +78,6 @@ namespace BlazorClient.Services
         private IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
         {
             var claims = new List<Claim>();
-            // El token JWT tiene 3 partes: Header.Payload.Signature
             var payload = jwt.Split('.')[1];
 
             // Rellenar el payload con "=" si es necesario (Base64 Padding)

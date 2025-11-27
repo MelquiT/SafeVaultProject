@@ -23,9 +23,9 @@
 <p class="mt-2">Resultado: <strong>@adminResult</strong></p>
 
 @code {
-    private string publicResult = "Esperando...";
-    private string authenticatedResult = "Esperando...";
-    private string adminResult = "Esperando...";
+    private string publicResult = "Waiting...";
+    private string authenticatedResult = "Waiting...";
+    private string adminResult = "Waiting...";
 
     private async Task CallEndpoint(string url, Action<string> setResult)
     {

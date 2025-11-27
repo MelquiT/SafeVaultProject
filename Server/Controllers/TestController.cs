@@ -7,15 +7,12 @@ namespace Server.Controllers
     [ApiController]
     public class TestController : ControllerBase
     {
-        // 1. Endpoint ABIERTO (Sin autorización)
         [HttpGet("public")]
         public IActionResult GetPublicData()
         {
             return Ok(new { Message = "Esta información es pública y no requiere login." });
         }
 
-        // 2. Endpoint PROTEGIDO (Requiere login, cualquier rol)
-        // Solo requiere que se envíe un JWT válido (token).
         [HttpGet("authenticated")]
         [Authorize]
         public IActionResult GetAuthenticatedData()
@@ -30,8 +27,6 @@ namespace Server.Controllers
             });
         }
 
-        // 3. Endpoint CON RESTRICCIÓN DE ROL
-        // Solo permite el acceso a usuarios que tengan el claim 'Role' con el valor 'Admin'.
         [HttpGet("admin-only")]
         [Authorize(Roles = "Admin")]
         public IActionResult GetAdminData()
@@ -45,8 +40,6 @@ namespace Server.Controllers
             });
         }
 
-        // 4. Endpoint CON MÚLTIPLES ROLES
-        // Permite el acceso a usuarios que sean 'Admin' O 'Manager'.
         [HttpGet("admin-or-manager")]
         [Authorize(Roles = "Admin, Manager")]
         public IActionResult GetAdminOrManagerData()

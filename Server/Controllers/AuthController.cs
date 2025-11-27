@@ -61,12 +61,9 @@ namespace Server.Controllers
             });
         }
 
-        // Método privado para crear el Token
         private string GenerateJwtToken(string email, string role)
         {
-            // CLAVE SECRETA: En producción, esto va en appsettings.json y debe ser muy larga
-            var keyStr = "EstaEsUnaClaveSuperSecretaYDebeTenerMasDe256BitsParaSeguridad";
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keyStr));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
@@ -89,8 +86,6 @@ namespace Server.Controllers
         }
     }
 
-
-    // DTOs para recibir y enviar datos
     // Las DataAnnotations actúan como firewall contra datos maliciosos (XSS)
     public class LoginDto
     {
