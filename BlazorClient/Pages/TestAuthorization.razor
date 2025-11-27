@@ -1,0 +1,63 @@
+﻿@page "/test-auth"
+@inject HttpClient Http
+
+<h3>Pruebas de Autorización y Roles</h3>
+<p>Llama a diferentes endpoints y verifica el resultado:</p>
+
+<hr />
+
+<h4>Endpoint Público: `/api/test/public`</h4>
+<button class="btn btn-secondary" @onclick="CallPublicEndpoint">Llamar</button>
+<p class="mt-2">Resultado: <strong>@publicResult</strong></p>
+
+---
+
+<h4>Endpoint Protegido (Cualquier usuario logueado): `/api/test/authenticated`</h4>
+<button class="btn btn-info text-white" @onclick="CallAuthenticatedEndpoint">Llamar</button>
+<p class="mt-2">Resultado: <strong>@authenticatedResult</strong></p>
+
+---
+
+<h4>Endpoint con Rol 'Admin': `/api/test/admin-only`</h4>
+<button class="btn btn-danger" @onclick="CallAdminEndpoint">Llamar</button>
+<p class="mt-2">Resultado: <strong>@adminResult</strong></p>
+
+@code {
+    private string publicResult = "Esperando...";
+    private string authenticatedResult = "Esperando...";
+    private string adminResult = "Esperando...";
+
+    private async Task CallEndpoint(string url, Action<string> setResult)
+    {
+        try
+        {
+            var response = await Http.GetAsync(url);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                setResult($"✅ Éxito ({response.StatusCode}): {content}");
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                setResult($"❌ Acceso Denegado (401 - Unauthorized): No estás logueado.");
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                setResult($"❌ Prohibido (403 - Forbidden): No tienes el rol necesario (Admin).");
+            }
+            else
+            {
+                setResult($"⚠️ Error: {response.StatusCode}");
+            }
+        }
+        catch (Exception ex)
+        {
+            setResult($"🛑 Excepción: {ex.Message}");
+        }
+    }
+
+    private Task CallPublicEndpoint() => CallEndpoint("api/test/public", r => publicResult = r);
+    private Task CallAuthenticatedEndpoint() => CallEndpoint("api/test/authenticated", r => authenticatedResult = r);
+    private Task CallAdminEndpoint() => CallEndpoint("api/test/admin-only", r => adminResult = r);
+}

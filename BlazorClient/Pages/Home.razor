@@ -1,0 +1,58 @@
+﻿@page "/"
+@using BlazorClient.Services
+@using Microsoft.AspNetCore.Components.Authorization
+@inject NavigationManager NavigationManager
+
+<h3>¡Bienvenido a la Home!</h3>
+
+<p>Esta sección es visible para todos, autenticados o no.</p>
+
+<hr/>
+
+<AuthorizeView>
+    <Authorized>
+        <h4>🎉 ¡Sesión Iniciada!</h4>
+        
+        <p>Hola, <strong>@context.User.Identity?.Name</strong>. Tu email es el principal identificador.</p>
+        
+        <AuthorizeView Roles="Admin" Context="innerContext">
+            <Authorized>
+                <div class="alert alert-danger">
+                    ⚠️ Tienes el rol <strong>Admin</strong>. Tienes acceso total.
+                </div>
+            </Authorized>
+            <NotAuthorized>
+                <div class="alert alert-info">
+                    ✅ Estás logueado, pero <strong>NO</strong> eres Administrador.
+                </div>
+            </NotAuthorized>
+        </AuthorizeView>
+        
+        <button class="btn btn-warning" @onclick="Logout">Cerrar Sesión</button>
+    </Authorized>
+    <NotAuthorized>
+        <div class="alert alert-secondary">
+            Por favor, <a href="/login">inicia sesión</a> para acceder a funciones avanzadas.
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    // 4. Implementación del Logout (Requiere inyección)
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationStateTask { get; set; }
+    
+    // Necesitas inyectar el proveedor para llamar a la función de logout
+    @inject AuthenticationStateProvider AuthStateProvider
+
+    private async Task Logout()
+    {
+        // Forzamos el cierre de sesión usando nuestro CustomAuthStateProvider
+        if (AuthStateProvider is CustomAuthStateProvider customProvider)
+        {
+            await customProvider.MarkUserAsLoggedOut();
+            // Opcional: Redirigir al login
+            NavigationManager.NavigateTo("/login");
+        }
+    }
+}
